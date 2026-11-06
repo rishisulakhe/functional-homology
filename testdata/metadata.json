@@ -1,0 +1,23 @@
+{
+  "seed": 42,
+  "requested_test_size": 200,
+  "organisms": {
+    "ecoli": {
+      "label": "Escherichia coli K-12",
+      "taxid": 83333,
+      "n_proteins": 200,
+      "fasta": "proteome_a.fasta"
+    },
+    "bsubtilis": {
+      "label": "Bacillus subtilis 168",
+      "taxid": 224308,
+      "n_proteins": 200,
+      "fasta": "proteome_b.fasta"
+    }
+  },
+  "n_annotations": 1197,
+  "n_annotated_proteins": 197,
+  "n_go_terms_annotated": 428,
+  "n_go_terms_in_obo_slice": 1193,
+  "generated_utc": "2026-11-06T04:22:26+00:00"
+}

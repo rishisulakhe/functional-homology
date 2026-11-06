@@ -1,0 +1,32 @@
+# Large / generated data
+data/
+results/
+work/
+tools/
+*.npy
+*.h5
+*.pt
+*.bin
+
+# Nextflow
+.nextflow/
+.nextflow.log*
+.trace
+timeline.html
+report.html
+dag.html
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.coverage
+htmlcov/
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
