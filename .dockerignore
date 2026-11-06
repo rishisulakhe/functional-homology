@@ -1,0 +1,9 @@
+data/
+results/
+work/
+tools/
+testdata/*.npy
+.git/
+.nextflow/
+__pycache__/
+.pytest_cache/
