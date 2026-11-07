@@ -1,0 +1,22 @@
+{
+  "params": {
+    "top_k": 5,
+    "cosine_threshold": 0.9,
+    "evalue_cutoff": 0.001,
+    "seed": 42
+  },
+  "n_proteins_a": 4531,
+  "n_proteins_b": 4191,
+  "n_topk_pairs": 22655,
+  "n_embedding_only": 16751,
+  "n_sequence_hits_topk": 4282,
+  "n_diamond_pairs": 15219,
+  "n_random_pairs": 16751,
+  "diamond_parse_stats": {
+    "lines": 15219,
+    "malformed": 0,
+    "non_significant": 0,
+    "unknown_id": 0,
+    "unique_pairs": 15219
+  }
+}

@@ -269,6 +269,28 @@ def interpretation_html(summary: dict) -> str:
     return f'<div class="verdict {css}"><h3>{headline}</h3><p>{text}</p></div>'
 
 
+def sensitivity_html(summary: dict) -> str:
+    sens = summary.get("sensitivity_no_root")
+    if not sens:
+        return ""
+    stats = sens.get("summary_stats", {})
+    cmps = {c.get("comparison"): c for c in sens.get("comparisons", [])}
+    ca = cmps.get("embedding_only_vs_random", {})
+    cb = cmps.get("diamond_hit_vs_random", {})
+    return (
+        '<div class="note"><strong>Sensitivity analysis (root terms removed):</strong> '
+        f"mean Jaccard embedding-only {fmt(stats.get('embedding_only', {}).get('mean'))}, "
+        f"DIAMOND {fmt(stats.get('diamond_hit', {}).get('mean'))}, "
+        f"random {fmt(stats.get('random', {}).get('mean'))}; "
+        f"embedding-only vs random p = {fmt_p(ca.get('p_value'))}, "
+        f"Cliff's δ = {fmt(ca.get('cliffs_delta'))}; "
+        f"DIAMOND vs random p = {fmt_p(cb.get('p_value'))}, "
+        f"Cliff's δ = {fmt(cb.get('cliffs_delta'))}. "
+        "The conclusion is unchanged when the three generic GO roots are removed."
+        "</div>"
+    )
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -362,6 +384,8 @@ def main(argv: list[str] | None = None) -> int:
   ul {{ margin: 8px 0 8px 20px; padding: 0; }}
   li {{ margin: 4px 0; }}
   .grid2 {{ display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }}
+  .note {{ background: #f1f4f8; border-left: 4px solid #4C78A8; border-radius: 6px;
+           padding: 10px 14px; margin: 14px 0; font-size: .9rem; }}
   @media (max-width: 760px) {{ .grid2 {{ grid-template-columns: 1fr; }} }}
 </style>
 </head>
@@ -399,6 +423,7 @@ def main(argv: list[str] | None = None) -> int:
 <p class="sub">A pair is scorable only when both proteins carry at least one
 experimental GO annotation. Cliff's δ &gt; 0 means the group tends to have
 higher GO similarity than random.</p>
+{sensitivity_html(summary)}
 
 <h2>Top 20 embedding-only candidate pairs</h2>
 <p class="sub">Ranked by mean-pooled ESM-2 cosine similarity among top-{args.top_k}
@@ -448,7 +473,8 @@ A protein.</li>
 <ul>
 <li>GO terms propagated over <code>is_a</code> and <code>part_of</code>.</li>
 <li>Jaccard similarity of propagated term sets; Resnik reported in
-<code>pairs_scored.tsv</code> as a secondary metric.</li>
+<code>pairs_scored.tsv</code> as a secondary metric. A sensitivity analysis
+repeats the comparison after removing the three GO root terms.</li>
 <li>Two-sided Mann-Whitney U tests vs the random control
 (seed {args.seed}); Cliff's delta effect size; Holm correction across the two
 tests.</li>

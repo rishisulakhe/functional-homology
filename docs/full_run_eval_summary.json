@@ -1,0 +1,170 @@
+{
+  "generated_utc": "2026-11-07T13:08:31+00:00",
+  "params": {
+    "cosine_threshold": 0.9,
+    "evidence_codes": [
+      "EXP",
+      "HDA",
+      "HEP",
+      "HGI",
+      "HMP",
+      "HTP",
+      "IDA",
+      "IEP",
+      "IGI",
+      "IMP",
+      "IPI"
+    ],
+    "distance": "jaccard on ancestor-propagated term sets (is_a + part_of)",
+    "test": "two-sided Mann-Whitney U; Cliff's delta effect size"
+  },
+  "go_graph": {
+    "n_terms": 48340,
+    "n_annotated_terms_missing_from_obo": 0
+  },
+  "annotation_stats": {
+    "rows": 24438,
+    "kept": 24438,
+    "bad_evidence": 0,
+    "not_qualifier": 0
+  },
+  "n_annotated_proteins": 4123,
+  "groups": {
+    "embedding_only": {
+      "n_input": 16751,
+      "n_scored": 1828,
+      "n_unscorable_missing_annotation": 14923,
+      "n_scored_with_shared_terms": 1585
+    },
+    "random": {
+      "n_input": 16751,
+      "n_scored": 1947,
+      "n_unscorable_missing_annotation": 14804,
+      "n_scored_with_shared_terms": 1543
+    },
+    "diamond_hit": {
+      "n_input": 15219,
+      "n_scored": 1843,
+      "n_unscorable_missing_annotation": 13376,
+      "n_scored_with_shared_terms": 1660
+    }
+  },
+  "summary_stats": {
+    "embedding_only": {
+      "n": 1828,
+      "mean": 0.12455706461428508,
+      "median": 0.08333333333333333,
+      "sd": 0.14664348678137462,
+      "q1": 0.04081632653061224,
+      "q3": 0.15151515151515152,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "diamond_hit": {
+      "n": 1843,
+      "mean": 0.16438552750177937,
+      "median": 0.10526315789473684,
+      "sd": 0.17632136009544994,
+      "q1": 0.047619047619047616,
+      "q3": 0.22418519646664636,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "random": {
+      "n": 1947,
+      "mean": 0.08066825236227065,
+      "median": 0.05263157894736842,
+      "sd": 0.11517637367557786,
+      "q1": 0.021739130434782608,
+      "q3": 0.1,
+      "min": 0.0,
+      "max": 1.0
+    }
+  },
+  "comparisons": [
+    {
+      "comparison": "embedding_only_vs_random",
+      "n_x": 1828,
+      "n_y": 1947,
+      "u": 2197019.5,
+      "p_value": 6.907206352894687e-36,
+      "cliffs_delta": 0.23458718400861334,
+      "direction": "higher",
+      "note": "Cliff's delta > 0 means x tends to be larger than y",
+      "p_value_holm": 6.907206352894687e-36
+    },
+    {
+      "comparison": "diamond_hit_vs_random",
+      "n_x": 1843,
+      "n_y": 1947,
+      "u": 2432656.0,
+      "p_value": 1.7255791235177702e-80,
+      "cliffs_delta": 0.3558742375612438,
+      "direction": "higher",
+      "note": "Cliff's delta > 0 means x tends to be larger than y",
+      "p_value_holm": 3.4511582470355404e-80
+    }
+  ],
+  "sensitivity_no_root": {
+    "description": "Same analysis after removing the three GO root terms (GO:0003674, GO:0005575, GO:0008150) from every term set.",
+    "summary_stats": {
+      "embedding_only": {
+        "n": 1828,
+        "mean": 0.0976469107146222,
+        "median": 0.05263157894736842,
+        "sd": 0.14332093013858757,
+        "q1": 0.01481721825654337,
+        "q3": 0.11764705882352941,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "diamond_hit": {
+        "n": 1843,
+        "mean": 0.14447606782366526,
+        "median": 0.07936507936507936,
+        "sd": 0.1778885383112256,
+        "q1": 0.028370221327967807,
+        "q3": 0.2,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "random": {
+        "n": 1947,
+        "mean": 0.05507594590655726,
+        "median": 0.02564102564102564,
+        "sd": 0.10950727193141165,
+        "q1": 0.0,
+        "q3": 0.06666666666666667,
+        "min": 0.0,
+        "max": 1.0
+      }
+    },
+    "comparisons": [
+      {
+        "comparison": "embedding_only_vs_random",
+        "n_x": 1828,
+        "n_y": 1947,
+        "u": 2223726.0,
+        "p_value": 1.7256685612225292e-41,
+        "cliffs_delta": 0.24959456224523158,
+        "direction": "higher",
+        "note": "Cliff's delta > 0 means x tends to be larger than y",
+        "p_value_holm": 1.7256685612225292e-41
+      },
+      {
+        "comparison": "diamond_hit_vs_random",
+        "n_x": 1843,
+        "n_y": 1947,
+        "u": 2515458.5,
+        "p_value": 2.3838946823647665e-104,
+        "cliffs_delta": 0.4020253483453682,
+        "direction": "higher",
+        "note": "Cliff's delta > 0 means x tends to be larger than y",
+        "p_value_holm": 4.767789364729533e-104
+      }
+    ]
+  },
+  "hypothesis": "supported",
+  "hypothesis_statement": "Group (a) embedding-only pairs have higher GO Jaccard similarity than group (c) random pairs (two-sided Mann-Whitney U p < 0.05 and Cliff's delta > 0).",
+  "hypothesis_supported": true
+}

@@ -42,9 +42,13 @@ EXPERIMENTAL_CODES = {
     "HTP", "HDA", "HMP", "HGI", "HEP",
 }
 
+# Generic root terms are reported in the primary Jaccard but removed in the
+# sensitivity metric, so results cannot be driven only by shared roots.
+ROOT_TERMS = {"GO:0003674", "GO:0005575", "GO:0008150"}
+
 SCORED_COLUMNS = [
     "group", "id_a", "id_b", "cosine", "pident", "evalue",
-    "jaccard", "resnik", "n_terms_a", "n_terms_b",
+    "jaccard", "jaccard_no_root", "resnik", "n_terms_a", "n_terms_b",
     "shared_go_ids", "shared_go_names",
 ]
 
@@ -259,6 +263,7 @@ def main(argv: list[str] | None = None) -> int:
 
     scored_rows: list[list] = []
     scored_by_group: dict[str, list[float]] = {g: [] for g in groups}
+    scored_by_group_no_root: dict[str, list[float]] = {g: [] for g in groups}
     counts: dict[str, dict] = {}
     for group, pairs in groups.items():
         n_scored = 0
@@ -274,22 +279,25 @@ def main(argv: list[str] | None = None) -> int:
                 n_missing_ann += 1
                 continue
             jac = jaccard(set_a, set_b)
+            jac_no_root = jaccard(set_a - ROOT_TERMS, set_b - ROOT_TERMS)
             res = resnik_similarity(set_a, set_b, ic)
-            shared = sorted(set_a & set_b)
+            shared = sorted(set_a & set_b, key=lambda t: (-ic.get(t, 0.0), t))
             scored_rows.append([
                 group, a, b, cos, pident, evalue,
-                f"{jac:.6f}", f"{res:.6f}", len(set_a), len(set_b),
+                f"{jac:.6f}", f"{jac_no_root:.6f}", f"{res:.6f}",
+                len(set_a), len(set_b),
                 ";".join(shared),
                 ";".join(names.get(t, t) for t in shared),
             ])
             scored_by_group[group].append(jac)
+            scored_by_group_no_root[group].append(jac_no_root)
             n_scored += 1
         counts[group] = {
             "n_input": len(pairs),
             "n_scored": n_scored,
             "n_unscorable_missing_annotation": n_missing_ann,
             "n_scored_with_shared_terms": int(sum(1 for row in scored_rows
-                                                  if row[0] == group and row[10])),
+                                                  if row[0] == group and row[11])),
         }
         LOG.info("Group %-15s input=%-6d scored=%-6d unscorable=%-6d",
                  group, len(pairs), n_scored, n_missing_ann)
@@ -311,6 +319,17 @@ def main(argv: list[str] | None = None) -> int:
     ]
     adjusted = holm_adjust([cmp["p_value"] for cmp in comparisons])
     for cmp, p_adj in zip(comparisons, adjusted):
+        cmp["p_value_holm"] = p_adj
+
+    a_nr = scored_by_group_no_root["embedding_only"]
+    b_nr = scored_by_group_no_root["diamond_hit"]
+    c_nr = scored_by_group_no_root["random"]
+    comparisons_nr = [
+        mann_whitney(a_nr, c_nr, "embedding_only_vs_random"),
+        mann_whitney(b_nr, c_nr, "diamond_hit_vs_random"),
+    ]
+    adjusted_nr = holm_adjust([cmp["p_value"] for cmp in comparisons_nr])
+    for cmp, p_adj in zip(comparisons_nr, adjusted_nr):
         cmp["p_value_holm"] = p_adj
 
     def supported(cmp: dict) -> bool | str:
@@ -344,6 +363,17 @@ def main(argv: list[str] | None = None) -> int:
             "random": stats_c,
         },
         "comparisons": comparisons,
+        "sensitivity_no_root": {
+            "description": (
+                "Same analysis after removing the three GO root terms "
+                "(GO:0003674, GO:0005575, GO:0008150) from every term set."),
+            "summary_stats": {
+                "embedding_only": describe(a_nr),
+                "diamond_hit": describe(b_nr),
+                "random": describe(c_nr),
+            },
+            "comparisons": comparisons_nr,
+        },
         "hypothesis": hypothesis,
         "hypothesis_statement": (
             "Group (a) embedding-only pairs have higher GO Jaccard similarity "
@@ -362,6 +392,12 @@ def main(argv: list[str] | None = None) -> int:
                  cmp["p_value_holm"] if cmp["p_value_holm"] is not None else float("nan"),
                  cmp["cliffs_delta"] if cmp["cliffs_delta"] is not None else float("nan"),
                  cmp["direction"])
+    LOG.info("Sensitivity (roots removed): a vs c p=%.4g delta=%.3f; "
+             "b vs c p=%.4g delta=%.3f",
+             comparisons_nr[0]["p_value"] if comparisons_nr[0]["p_value"] is not None else float("nan"),
+             comparisons_nr[0]["cliffs_delta"] if comparisons_nr[0]["cliffs_delta"] is not None else float("nan"),
+             comparisons_nr[1]["p_value"] if comparisons_nr[1]["p_value"] is not None else float("nan"),
+             comparisons_nr[1]["cliffs_delta"] if comparisons_nr[1]["cliffs_delta"] is not None else float("nan"))
     LOG.info("Hypothesis: %s", hypothesis)
     return 0
 
